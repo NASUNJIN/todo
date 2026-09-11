@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { useTodoStore } from '@/stores/todos'
+import { MdOutlinedBarChart, BxSolidDoughnutChart } from '@kalimahapps/vue-icons'
 const store = useTodoStore()
 const { completionRate, completedCount, todos, tagStats } = storeToRefs(store)
 const stroke = 339.292
@@ -14,7 +15,9 @@ const colors = { 일: '#3b82f6', 공부: '#ec4899', 운동: '#10b981', 개인: '
       <div
         class="flex items-center justify-between border-b border-slate-200 pb-3 dark:border-slate-700"
       >
-        <h2 class="text-sm font-bold">◯ 오늘의 달성률</h2>
+        <h2 class="text-sm font-bold flex items-center">
+          <BxSolidDoughnutChart class="inline-block mr-1.5" />오늘의 달성률
+        </h2>
         <span class="text-xs font-bold text-emerald-500">진행 중</span>
       </div>
       <div class="relative mx-auto my-7 size-40">
@@ -67,7 +70,9 @@ const colors = { 일: '#3b82f6', 공부: '#ec4899', 운동: '#10b981', 개인: '
       <div
         class="flex items-center justify-between border-b border-slate-200 pb-3 dark:border-slate-700"
       >
-        <h2 class="text-sm font-bold">▥ 태그별 진행 현황</h2>
+        <h2 class="text-sm font-bold flex items-center">
+          <MdOutlinedBarChart class="inline-block mr-1.5" />태그별 진행 현황
+        </h2>
         <span class="text-xs text-slate-400">카테고리별</span>
       </div>
       <div class="mt-4 space-y-5">

@@ -4,12 +4,14 @@ import { storeToRefs } from 'pinia'
 import TodoItem from './TodoItem.vue'
 import { tags, type TodoTag } from '@/types/todo'
 import { useTodoStore } from '@/stores/todos'
+import { HiArchiveBox, HiTrash, HiTag } from '@kalimahapps/vue-icons'
 const store = useTodoStore()
 const { filteredTodos, completedCount, activeTag, todos, completionRate } = storeToRefs(store)
 const title = ref('')
 const selectedTag = ref<TodoTag>('일')
 const showForm = ref(false)
 const filterOptions: Array<TodoTag | '전체'> = ['전체', ...tags]
+// 색상 몇개 뽑아놓기
 const dots = {
   전체: 'bg-white',
   일: 'bg-blue-400',
@@ -54,10 +56,12 @@ function submit() {
       class="rounded-2xl border border-blue-100 bg-white p-4 dark:border-slate-700 dark:bg-[#152033]"
     >
       <div class="mb-3 flex items-center justify-between text-xs text-slate-400">
-        <span>◇ 태그 빠른 필터 & 선택</span
+        <span class="flex items-center"
+          ><HiTag class="inline-block mr-1.5 scale-x-[-1]" />태그 필터 & 선택</span
         ><span class="hidden sm:block">태그를 클릭하여 필터링하거나 선택하세요</span>
       </div>
       <div class="flex flex-wrap gap-2">
+        <!-- 태그 추가 버튼 구현 -->
         <button
           v-for="filter in filterOptions"
           :key="filter"
@@ -80,20 +84,21 @@ function submit() {
       <div
         class="flex items-center justify-between border-b border-slate-100 pb-4 text-sm dark:border-slate-700"
       >
-        <div>
+        <div class="flex items-center">
           <strong
             class="rounded bg-pink-50 px-2 py-1 text-pink-600 dark:bg-pink-950 dark:text-pink-300"
-            >▣ 할 일 목록</strong
+            ><HiArchiveBox class="inline-block mr-1.5 text-lg" />할 일 목록</strong
           ><span class="ml-3 text-xs text-slate-400"
             >총 {{ todos.length }}개 중 {{ completedCount }}개 완료</span
           >
         </div>
+        <!-- 삭제 누르면 진짜 삭제할껀지 모달창 혹은 팝업창 띄우기 -->
         <button
           v-if="completedCount"
-          class="text-xs text-slate-400 hover:text-rose-500"
+          class="text-xs text-slate-400 hover:text-rose-500 flex items-center"
           @click="store.clearCompleted"
         >
-          완료 항목 정리
+          <HiTrash class="inline-block mr-1.5" />완료 항목 삭제
         </button>
       </div>
       <ul v-if="filteredTodos.length" class="mt-3 space-y-2">
@@ -111,9 +116,11 @@ function submit() {
           v-model="title"
           autofocus
           required
-          placeholder="새로운 할 일을 입력하세요"
+          placeholder="새로운 할 일을 입력하세요."
           class="min-w-0 flex-1 rounded-lg bg-slate-50 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-300 dark:bg-slate-800"
-        /><select
+        />
+        <!-- 드롭다운 박스 디자인 수정하기 -->
+        <select
           v-model="selectedTag"
           class="rounded-lg bg-slate-50 px-3 py-2 text-sm dark:bg-slate-800"
         >
@@ -131,7 +138,7 @@ function submit() {
         class="mt-4 w-full rounded-xl border-2 border-dashed border-blue-100 py-3 text-sm text-slate-500 hover:border-blue-300 hover:text-blue-600 dark:border-slate-700 dark:text-slate-400"
         @click="showForm = true"
       >
-        ⊕ 새로운 할 일 추가 (Create a new task)
+        ⊕ 새로운 할 일 추가
       </button>
     </div>
   </section>

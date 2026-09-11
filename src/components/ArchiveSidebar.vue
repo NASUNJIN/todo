@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { archive } from '@/stores/todos'
+import { AkHistory, MdRoundAutoGraph, RaCalendar } from '@kalimahapps/vue-icons'
 const colors = {
   일: 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300',
   공부: 'bg-pink-100 text-pink-600 dark:bg-pink-950 dark:text-pink-300',
@@ -16,7 +17,9 @@ const colors = {
       <div
         class="flex items-center justify-between border-b border-slate-200 pb-3 dark:border-slate-700"
       >
-        <h2 class="font-bold">↶ 과거 기록</h2>
+        <h2 class="font-bold flex items-center">
+          <AkHistory class="inline-block mr-1" />과거 기록
+        </h2>
         <span class="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-400 dark:bg-slate-800"
           >최근 7일</span
         >
@@ -51,15 +54,16 @@ const colors = {
         </article>
       </div>
       <button
-        class="mt-3 w-full rounded-xl border border-blue-100 bg-blue-50 py-2 text-xs font-semibold text-slate-600 hover:bg-blue-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+        class="mt-3 w-full rounded-xl border border-blue-100 bg-blue-50 py-2 text-xs font-semibold text-slate-600 hover:bg-blue-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 flex items-center justify-center"
       >
-        ▦ 캘린더로 전체 보기
+        <RaCalendar class="inline-block mr-1.5" />캘린더로 전체 보기
       </button>
     </section>
     <div
       class="flex items-center justify-between rounded-2xl border border-blue-100 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-[#152033]"
     >
-      <span class="text-slate-500 dark:text-slate-400">⌁ 이번 주 평균 달성률</span
+      <span class="text-slate-500 dark:text-slate-400"
+        ><MdRoundAutoGraph class="inline-block mr-1.5" />이번 주 평균 달성률</span
       ><strong class="text-emerald-500">82%</strong>
     </div>
   </aside>

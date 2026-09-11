@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useThemeStore } from '@/stores/theme'
+import { AkCalendar } from '@kalimahapps/vue-icons'
 const theme = useThemeStore()
 const today = new Intl.DateTimeFormat('ko-KR', {
   month: 'long',
@@ -33,8 +34,8 @@ const today = new Intl.DateTimeFormat('ko-KR', {
       </div>
       <div class="flex items-center gap-3">
         <span
-          class="hidden rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs text-slate-600 sm:inline dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
-          >▣ {{ today }}</span
+          class="hidden rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs text-slate-600 sm:inline dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 flex items-centers"
+          ><AkCalendar class="inline-block mr-1.5" />{{ today }}</span
         >
         <button
           class="grid size-10 place-items-center rounded-xl bg-slate-100 text-lg transition hover:bg-slate-200 focus-visible:outline-2 focus-visible:outline-blue-500 dark:bg-slate-800 dark:hover:bg-slate-700"
