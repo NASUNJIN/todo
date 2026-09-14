@@ -2,7 +2,10 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  font-family:
+    'Noto Sans KR',
+    'Apple SD Gothic Neo',
+    'Malgun Gothic' sans-serif;
   color: #152033;
   background: #f5f7fc;
   font-synthesis: none;
