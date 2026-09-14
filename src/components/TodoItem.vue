@@ -8,6 +8,7 @@ const store = useTodoStore()
 const editing = ref(false)
 const draft = ref(props.todo.title)
 const draftTag = ref<TodoTag>(props.todo.tag)
+// 태그 색상 뽑아놓기 + 추가 가능하게 만들기, 태그도 interface로 만들어서 타입 지정해주기
 const tagStyles = {
   일: 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-300',
   공부: 'bg-pink-50 text-pink-600 dark:bg-pink-950 dark:text-pink-300',
@@ -24,6 +25,7 @@ function save() {
   <li
     class="group flex min-h-14 items-center gap-3 rounded-xl border border-blue-100 bg-white px-3 py-2 transition hover:border-blue-200 dark:border-slate-700 dark:bg-[#111c2e] dark:hover:border-slate-600"
   >
+    <!-- 완료 체크 버튼 태그별 색상으로-->
     <button
       class="grid size-7 shrink-0 place-items-center rounded-full border-2 text-white transition"
       :class="
@@ -36,6 +38,7 @@ function save() {
     >
       <span v-if="todo.completed">✓</span>
     </button>
+    <!-- 수정 및 삭제 부분 평소엔 안보이게 하다가 호버 되면 보이게하기, 안보일땐 태그가 가장 우측으로 가게 만들기 -->
     <template v-if="editing">
       <input
         v-model="draft"
