@@ -6,7 +6,7 @@ import { tags, type TodoTag } from '@/types/todo'
 import { useTodoStore } from '@/stores/todos'
 import { HiArchiveBox, HiTrash, HiTag } from '@kalimahapps/vue-icons'
 const store = useTodoStore()
-const { filteredTodos, completedCount, activeTag, todos, completionRate } = storeToRefs(store)
+const { filteredTodos, completedCount, activeTag, todayTodos, completionRate } = storeToRefs(store)
 const title = ref('')
 const selectedTag = ref<TodoTag>('일')
 const showForm = ref(false)
@@ -44,7 +44,7 @@ function submit() {
         >
           <i class="mr-2 inline-block size-2.5 rounded-full bg-emerald-500"></i
           ><span class="text-slate-500 dark:text-slate-400">달성률</span>
-          <strong class="mx-2">{{ completedCount }} / {{ todos.length }} 완료</strong
+          <strong class="mx-2">{{ completedCount }} / {{ todayTodos.length }} 완료</strong
           ><span
             class="rounded-md bg-emerald-50 px-2 py-1 font-bold text-emerald-600 dark:bg-emerald-950"
             >{{ completionRate }}%</span
@@ -89,7 +89,7 @@ function submit() {
             class="rounded bg-pink-50 px-2 py-1 text-pink-600 dark:bg-pink-950 dark:text-pink-300"
             ><HiArchiveBox class="inline-block mr-1.5 text-lg" />할 일 목록</strong
           ><span class="ml-3 text-xs text-slate-400"
-            >총 {{ todos.length }}개 중 {{ completedCount }}개 완료</span
+            >총 {{ todayTodos.length }}개 중 {{ completedCount }}개 완료</span
           >
         </div>
         <!-- 삭제 누르면 진짜 삭제할껀지 모달창 혹은 팝업창 띄우기 -->

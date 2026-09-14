@@ -13,7 +13,7 @@ const today = new Intl.DateTimeFormat('ko-KR', {
   <header
     class="border-b border-blue-100 bg-[#f7f9ff] transition-colors dark:border-slate-800 dark:bg-[#0d1728]"
   >
-    <div class="mx-auto flex h-16 max-w-[1536px] items-center justify-between px-5 sm:px-6">
+    <div class="mx-auto flex h-16 max-w-384 items-center justify-between px-5 sm:px-6">
       <div class="flex items-center gap-3">
         <div class="grid size-9 place-items-center rounded-xl bg-blue-600 text-white shadow-sm">
           <svg
@@ -34,7 +34,7 @@ const today = new Intl.DateTimeFormat('ko-KR', {
       </div>
       <div class="flex items-center gap-3">
         <span
-          class="hidden rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs text-slate-600 sm:inline dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 flex items-centers"
+          class="rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs text-slate-600 sm:inline dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 flex items-centers"
           ><AkCalendar class="inline-block mr-1.5" />{{ today }}</span
         >
         <button

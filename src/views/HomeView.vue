@@ -7,18 +7,18 @@ import StatsPanel from '@/components/StatsPanel.vue'
 
 <template>
   <div
-    class="min-h-screen bg-[#f5f7fc] text-slate-800 transition-colors dark:bg-[#090e17] dark:text-slate-100"
+    class="min-h-screen flex flex-col bg-[#f5f7fc] text-slate-800 transition-colors dark:bg-[#090e17] dark:text-slate-100"
   >
     <AppHeader />
     <main
-      class="mx-auto grid max-w-[1536px] grid-cols-1 gap-5 px-4 py-6 lg:grid-cols-[290px_minmax(0,1fr)] xl:grid-cols-[290px_minmax(520px,1fr)_290px] xl:px-6"
+      class="flex-1 mx-auto grid max-w-384 grid-cols-1 gap-5 px-4 py-6 lg:grid-cols-[290px_minmax(0,1fr)] xl:grid-cols-[290px_minmax(520px,1fr)_290px] xl:px-6"
     >
       <ArchiveSidebar />
       <TodoWorkspace />
       <StatsPanel class="lg:col-span-2 xl:col-span-1" />
     </main>
     <footer
-      class="mx-auto mt-10 flex max-w-[1536px] flex-col gap-2 border-t border-slate-200 px-6 py-5 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800"
+      class="mt-auto mx-auto flex max-w-384 flex-col gap-2 border-t border-slate-200 px-6 py-5 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800"
     >
       <span>TaskFlow · 할 일을 정리해 보아요</span
       ><span>Enter 빠른 입력 · Click 완료 체크 · Tag 스마트 분류</span>
