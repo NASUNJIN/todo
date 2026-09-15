@@ -6,13 +6,16 @@ export interface TagDefinition {
 }
 
 export const defaultTags: TagDefinition[] = [
-  { name: '일', color: '#3b82f6' },
-  { name: '공부', color: '#ec4899' },
-  { name: '운동', color: '#10b981' },
-  { name: '개인', color: '#a855f7' },
+  { name: '일', color: '#60a5fa' },
+  { name: '공부', color: '#f472b6' },
+  { name: '운동', color: '#34d399' },
+  { name: '개인', color: '#c084fc' },
+  { name: '기타', color: '#94a3b8' },
 ]
 
-export const customTagColors = ['#ef4444', '#f97316', '#f59e0b', '#14b8a6', '#06b6d4', '#6366f1']
+export const fallbackTag: TodoTag = '기타'
+
+export const customTagColors = ['#fb7185', '#fb923c', '#fbbf24', '#2dd4bf', '#38bdf8', '#818cf8']
 export interface Todo {
   id: string
   title: string

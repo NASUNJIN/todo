@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue'
+import { nextTick, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import TodoItem from './TodoItem.vue'
-import { customTagColors, type TodoTag } from '@/types/todo'
+import ConfirmDialog from './ConfirmDialog.vue'
+import { customTagColors, fallbackTag, type TodoTag } from '@/types/todo'
 import { useTodoStore } from '@/stores/todos'
 import { HiArchiveBox, HiTrash, HiTag } from '@kalimahapps/vue-icons'
 const store = useTodoStore()
@@ -12,14 +13,12 @@ const title = ref('')
 const selectedTag = ref<TodoTag>('일')
 const showForm = ref(false)
 const showTagModal = ref(false)
+const showCompletedDeleteConfirm = ref(false)
+const tagPendingDelete = ref<TodoTag | null>(null)
 const tagName = ref('')
 const tagColor = ref(customTagColors[0]!)
 const tagError = ref('')
 const tagNameInput = ref<HTMLInputElement | null>(null)
-const filterOptions = computed<Array<TodoTag | '전체'>>(() => [
-  '전체',
-  ...tags.value.map((tag) => tag.name),
-])
 function openTagModal() {
   tagName.value = ''
   tagColor.value = customTagColors[0]!
@@ -44,6 +43,21 @@ function submit() {
   title.value = ''
   showForm.value = false
 }
+function openTodoForm() {
+  if (activeTag.value !== '전체') selectedTag.value = activeTag.value
+  showForm.value = true
+}
+function confirmTagDelete() {
+  if (!tagPendingDelete.value) return
+  const deletedTag = tagPendingDelete.value
+  store.deleteTag(deletedTag)
+  if (selectedTag.value === deletedTag) selectedTag.value = fallbackTag
+  tagPendingDelete.value = null
+}
+function confirmCompletedDelete() {
+  store.clearCompleted()
+  showCompletedDeleteConfirm.value = false
+}
 </script>
 <template>
   <section class="space-y-4">
@@ -57,16 +71,16 @@ function submit() {
             ><i class="mr-2 inline-block size-2 rounded-full bg-emerald-500"></i>오늘의 루틴
             집중</span
           >
-          <h1 class="mt-3 text-2xl font-bold tracking-tight">오늘의 할 일</h1>
+          <h1 class="mt-2 text-2xl font-bold tracking-tight">오늘의 할 일</h1>
         </div>
         <div
-          class="rounded-xl border border-blue-100 bg-blue-50 px-4 py-2 text-sm dark:border-slate-700 dark:bg-slate-800"
+          class="rounded-xl border border-blue-100 bg-blue-50 px-3 py-1.5 text-sm dark:border-slate-700 dark:bg-slate-800"
         >
           <i class="mr-2 inline-block size-2.5 rounded-full bg-emerald-500"></i
           ><span class="text-slate-500 dark:text-slate-400">달성률</span>
           <strong class="mx-2">{{ completedCount }} / {{ todayTodos.length }} 완료</strong
           ><span
-            class="rounded-md bg-emerald-50 px-2 py-1 font-bold text-emerald-600 dark:bg-emerald-950"
+            class="rounded-md bg-emerald-50 px-2 py-0.5 font-bold text-emerald-600 dark:bg-emerald-950"
             >{{ completionRate }}%</span
           >
         </div>
@@ -83,22 +97,49 @@ function submit() {
       <div class="flex flex-wrap gap-2 text-xs">
         <!-- 태그 추가 버튼 구현 -->
         <button
-          v-for="filter in filterOptions"
-          :key="filter"
-          class="rounded-full border px-2.5 py-1 text-sm transition"
+          class="rounded-full border px-2.5 py-1 text-sm transition flex items-center"
           :class="
-            activeTag === filter
+            activeTag === '전체'
               ? 'border-blue-600 bg-blue-600 text-white'
               : 'border-blue-100 bg-blue-50 text-slate-600 hover:border-blue-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
           "
-          @click="activeTag = filter"
+          @click="activeTag = '전체'"
         >
-          <i
-            class="mr-1.5 inline-block size-2 rounded-full"
-            :style="{ backgroundColor: filter === '전체' ? '#ffffff' : store.tagColor(filter) }"
-          ></i
-          >{{ filter === '전체' ? '전체 보기' : filter }}
+          <i class="mr-1.5 inline-block size-2 rounded-full bg-white"></i>전체 보기
         </button>
+        <div
+          v-for="tag in tags"
+          :key="tag.name"
+          class="inline-flex overflow-hidden rounded-full border text-xs transition"
+          :class="
+            activeTag === tag.name
+              ? 'border-blue-600 bg-blue-600 text-white'
+              : 'border-blue-100 bg-blue-50 text-slate-600 hover:border-blue-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
+          "
+        >
+          <button
+            class="py-1 pl-2.5 flex items-center text-sm"
+            :class="tag.isCustom ? 'pr-1.5' : 'pr-2.5'"
+            @click="activeTag = tag.name"
+          >
+            <i
+              class="mr-1.5 inline-block size-2 rounded-full"
+              :style="{ backgroundColor: tag.color }"
+            ></i
+            >{{ tag.name }}
+          </button>
+          <button
+            v-if="tag.isCustom"
+            class="border-l px-2 transition hover:bg-rose-500 hover:text-white"
+            :class="
+              activeTag === tag.name ? 'border-blue-500' : 'border-blue-100 dark:border-slate-700'
+            "
+            :aria-label="`${tag.name} 태그 삭제`"
+            @click="tagPendingDelete = tag.name"
+          >
+            ×
+          </button>
+        </div>
         <button
           class="rounded-full border border-dashed border-slate-300 px-2.5 py-1 text-sm text-slate-500 transition hover:border-blue-300 hover:text-blue-600 dark:border-slate-600 dark:text-slate-300"
           @click="openTagModal"
@@ -125,9 +166,9 @@ function submit() {
         <button
           v-if="completedCount"
           class="text-xs text-slate-400 hover:text-rose-500 flex items-center"
-          @click="store.clearCompleted"
+          @click="showCompletedDeleteConfirm = true"
         >
-          <HiTrash class="inline-block mr-1.5" />완료 항목 삭제
+          <HiTrash class="inline-block mr-1.5" />완료 항목 모두 삭제
         </button>
       </div>
       <ul v-if="filteredTodos.length" class="mt-3 space-y-2">
@@ -167,7 +208,7 @@ function submit() {
       <button
         v-else
         class="mt-4 w-full rounded-xl border-2 border-dashed border-blue-100 py-3 text-sm text-slate-500 hover:border-blue-300 hover:text-blue-600 dark:border-slate-700 dark:text-slate-400"
-        @click="showForm = true"
+        @click="openTodoForm"
       >
         ⊕ 새로운 할 일 추가
       </button>
@@ -254,5 +295,19 @@ function submit() {
         </form>
       </div>
     </Teleport>
+    <ConfirmDialog
+      v-if="showCompletedDeleteConfirm"
+      title="완료 항목을 삭제하시겠습니까?"
+      message="오늘 완료한 항목이 모두 삭제되며, 삭제한 데이터는 복구할 수 없습니다."
+      @cancel="showCompletedDeleteConfirm = false"
+      @confirm="confirmCompletedDelete"
+    />
+    <ConfirmDialog
+      v-if="tagPendingDelete"
+      title="태그를 삭제하시겠습니까?"
+      :message="`'${tagPendingDelete}' 태그가 삭제됩니다. 이 태그를 사용한 할 일과 과거 기록은 삭제되지 않고 '기타' 태그로 이동합니다.`"
+      @cancel="tagPendingDelete = null"
+      @confirm="confirmTagDelete"
+    />
   </section>
 </template>

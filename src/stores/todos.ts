@@ -1,7 +1,7 @@
 import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import type { ArchiveDay, TagDefinition, Todo, TodoTag } from '@/types/todo'
-import { defaultTags } from '@/types/todo'
+import { defaultTags, fallbackTag } from '@/types/todo'
 const STORAGE_KEY = 'taskflow-todos'
 const TAG_STORAGE_KEY = 'taskflow-tags'
 const DAY_IN_MS = 24 * 60 * 60 * 1000
@@ -25,6 +25,11 @@ export const useTodoStore = defineStore('todos', () => {
   const savedTags = localStorage.getItem(TAG_STORAGE_KEY)
   const customTags = ref<TagDefinition[]>(savedTags ? JSON.parse(savedTags) : [])
   const tags = computed(() => [...defaultTags, ...customTags.value])
+  const knownTagNames = new Set(tags.value.map((tag) => tag.name))
+  todos.value = todos.value.map((todo) =>
+    knownTagNames.has(todo.tag) ? todo : { ...todo, tag: fallbackTag },
+  )
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(todos.value))
   const activeTag = ref<TodoTag | '전체'>('전체')
   const todayTodos = computed(() => todos.value.filter(isToday))
   const filteredTodos = computed(() =>
@@ -122,6 +127,19 @@ export const useTodoStore = defineStore('todos', () => {
     return tags.value.find((tag) => tag.name === name)?.color ?? '#64748b'
   }
 
+  function deleteTag(name: TodoTag) {
+    const index = customTags.value.findIndex((tag) => tag.name === name)
+    if (index === -1) return false
+    todos.value = todos.value.map((todo) =>
+      todo.tag === name ? { ...todo, tag: fallbackTag } : todo,
+    )
+    customTags.value.splice(index, 1)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos.value))
+    localStorage.setItem(TAG_STORAGE_KEY, JSON.stringify(customTags.value))
+    if (activeTag.value === name) activeTag.value = fallbackTag
+    return true
+  }
+
   function toggleTodo(id: string) {
     const todo = todos.value.find((item) => item.id === id)
     if (todo) todo.completed = !todo.completed
@@ -156,6 +174,7 @@ export const useTodoStore = defineStore('todos', () => {
     weeklyCompletionRate,
     tags,
     addTag,
+    deleteTag,
     tagColor,
     addTodo,
     toggleTodo,

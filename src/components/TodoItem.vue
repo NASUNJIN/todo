@@ -3,12 +3,14 @@ import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import type { Todo, TodoTag } from '@/types/todo'
 import { useTodoStore } from '@/stores/todos'
+import ConfirmDialog from './ConfirmDialog.vue'
 const props = defineProps<{ todo: Todo }>()
 const store = useTodoStore()
 const { tags } = storeToRefs(store)
 const editing = ref(false)
 const draft = ref(props.todo.title)
 const draftTag = ref<TodoTag>(props.todo.tag)
+const showDeleteConfirm = ref(false)
 function tagStyle(tag: TodoTag) {
   const color = store.tagColor(tag)
   return { color, backgroundColor: `${color}1a` }
@@ -73,11 +75,18 @@ function save() {
         ><button
           class="p-1 text-slate-400 hover:text-rose-500"
           aria-label="삭제"
-          @click="store.deleteTodo(todo.id)"
+          @click="showDeleteConfirm = true"
         >
           ×
         </button>
       </div>
     </template>
+    <ConfirmDialog
+      v-if="showDeleteConfirm"
+      title="할 일을 삭제하시겠습니까?"
+      message="삭제한 할 일 데이터는 복구할 수 없습니다."
+      @cancel="showDeleteConfirm = false"
+      @confirm="store.deleteTodo(todo.id); showDeleteConfirm = false"
+    />
   </li>
 </template>
