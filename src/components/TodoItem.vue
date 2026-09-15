@@ -1,19 +1,17 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import type { Todo, TodoTag } from '@/types/todo'
-import { tags } from '@/types/todo'
 import { useTodoStore } from '@/stores/todos'
 const props = defineProps<{ todo: Todo }>()
 const store = useTodoStore()
+const { tags } = storeToRefs(store)
 const editing = ref(false)
 const draft = ref(props.todo.title)
 const draftTag = ref<TodoTag>(props.todo.tag)
-// 태그 색상 뽑아놓기 + 추가 가능하게 만들기, 태그도 interface로 만들어서 타입 지정해주기
-const tagStyles = {
-  일: 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-300',
-  공부: 'bg-pink-50 text-pink-600 dark:bg-pink-950 dark:text-pink-300',
-  운동: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-300',
-  개인: 'bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-300',
+function tagStyle(tag: TodoTag) {
+  const color = store.tagColor(tag)
+  return { color, backgroundColor: `${color}1a` }
 }
 function save() {
   store.updateTodo(props.todo.id, draft.value, draftTag.value)
@@ -50,7 +48,7 @@ function save() {
         v-model="draftTag"
         class="rounded-lg border border-blue-200 bg-white px-2 py-1 text-sm dark:border-slate-600 dark:bg-slate-800"
       >
-        <option v-for="tag in tags" :key="tag">{{ tag }}</option>
+        <option v-for="tag in tags" :key="tag.name" :value="tag.name">{{ tag.name }}</option>
       </select>
       <button class="text-sm font-bold text-blue-600" @click="save">저장</button>
     </template>
@@ -60,7 +58,7 @@ function save() {
         :class="todo.completed && 'text-slate-400 line-through'"
         >{{ todo.title }}</span
       >
-      <span class="rounded-full px-2.5 py-1 text-xs" :class="tagStyles[todo.tag]">{{
+      <span class="rounded-full px-2.5 py-1 text-xs" :style="tagStyle(todo.tag)">{{
         todo.tag
       }}</span>
       <div

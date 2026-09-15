@@ -1,23 +1,43 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import TodoItem from './TodoItem.vue'
-import { tags, type TodoTag } from '@/types/todo'
+import { customTagColors, type TodoTag } from '@/types/todo'
 import { useTodoStore } from '@/stores/todos'
 import { HiArchiveBox, HiTrash, HiTag } from '@kalimahapps/vue-icons'
 const store = useTodoStore()
-const { filteredTodos, completedCount, activeTag, todayTodos, completionRate } = storeToRefs(store)
+const { filteredTodos, completedCount, activeTag, todayTodos, completionRate, tags } =
+  storeToRefs(store)
 const title = ref('')
 const selectedTag = ref<TodoTag>('일')
 const showForm = ref(false)
-const filterOptions: Array<TodoTag | '전체'> = ['전체', ...tags]
-// 색상 몇개 뽑아놓기
-const dots = {
-  전체: 'bg-white',
-  일: 'bg-blue-400',
-  공부: 'bg-pink-400',
-  운동: 'bg-emerald-400',
-  개인: 'bg-purple-400',
+const showTagModal = ref(false)
+const tagName = ref('')
+const tagColor = ref(customTagColors[0]!)
+const tagError = ref('')
+const tagNameInput = ref<HTMLInputElement | null>(null)
+const filterOptions = computed<Array<TodoTag | '전체'>>(() => [
+  '전체',
+  ...tags.value.map((tag) => tag.name),
+])
+function openTagModal() {
+  tagName.value = ''
+  tagColor.value = customTagColors[0]!
+  tagError.value = ''
+  showTagModal.value = true
+  nextTick(() => tagNameInput.value?.focus())
+}
+function submitTag() {
+  if (!tagName.value.trim()) {
+    tagError.value = '태그 이름을 입력해주세요.'
+    return
+  }
+  if (!store.addTag(tagName.value, tagColor.value)) {
+    tagError.value = '이미 사용 중인 태그 이름이에요.'
+    return
+  }
+  selectedTag.value = tagName.value.trim()
+  showTagModal.value = false
 }
 function submit() {
   store.addTodo(title.value, selectedTag.value)
@@ -57,15 +77,15 @@ function submit() {
     >
       <div class="mb-3 flex items-center justify-between text-xs text-slate-400">
         <span class="flex items-center"
-          ><HiTag class="inline-block mr-1.5 scale-x-[-1]" />태그 필터 & 선택</span
-        ><span class="hidden sm:block">태그를 클릭하여 필터링하거나 선택하세요</span>
+          ><HiTag class="inline-block mr-1.5 scale-x-[-1]" />태그 필터 & 추가</span
+        ><span class="hidden sm:block">태그를 클릭하여 필터링하거나 추가하세요</span>
       </div>
-      <div class="flex flex-wrap gap-2">
+      <div class="flex flex-wrap gap-2 text-xs">
         <!-- 태그 추가 버튼 구현 -->
         <button
           v-for="filter in filterOptions"
           :key="filter"
-          class="rounded-full border px-3 py-1.5 text-sm transition"
+          class="rounded-full border px-2.5 py-1 text-sm transition"
           :class="
             activeTag === filter
               ? 'border-blue-600 bg-blue-600 text-white'
@@ -73,8 +93,17 @@ function submit() {
           "
           @click="activeTag = filter"
         >
-          <i class="mr-1.5 inline-block size-2 rounded-full" :class="dots[filter]"></i
+          <i
+            class="mr-1.5 inline-block size-2 rounded-full"
+            :style="{ backgroundColor: filter === '전체' ? '#ffffff' : store.tagColor(filter) }"
+          ></i
           >{{ filter === '전체' ? '전체 보기' : filter }}
+        </button>
+        <button
+          class="rounded-full border border-dashed border-slate-300 px-2.5 py-1 text-sm text-slate-500 transition hover:border-blue-300 hover:text-blue-600 dark:border-slate-600 dark:text-slate-300"
+          @click="openTagModal"
+        >
+          ＋ 태그 추가
         </button>
       </div>
     </div>
@@ -82,12 +111,12 @@ function submit() {
       class="rounded-2xl border border-blue-100 bg-white p-5 dark:border-slate-700 dark:bg-[#152033]"
     >
       <div
-        class="flex items-center justify-between border-b border-slate-100 pb-4 text-sm dark:border-slate-700"
+        class="flex items-center justify-between border-b border-slate-100 pb-4 text-xs dark:border-slate-700"
       >
         <div class="flex items-center">
           <strong
-            class="rounded bg-pink-50 px-2 py-1 text-pink-600 dark:bg-pink-950 dark:text-pink-300"
-            ><HiArchiveBox class="inline-block mr-1.5 text-lg" />할 일 목록</strong
+            class="rounded bg-pink-50 px-2 py-1 text-pink-600 dark:bg-pink-950 dark:text-pink-300 flex items-center text-xs"
+            ><HiArchiveBox class="inline-block mr-1.5" />할 일 목록</strong
           ><span class="ml-3 text-xs text-slate-400"
             >총 {{ todayTodos.length }}개 중 {{ completedCount }}개 완료</span
           >
@@ -124,7 +153,9 @@ function submit() {
           v-model="selectedTag"
           class="rounded-lg bg-slate-50 px-3 py-2 text-sm dark:bg-slate-800"
         >
-          <option v-for="tag in tags" :key="tag">{{ tag }}</option></select
+          <option v-for="tag in tags" :key="tag.name" :value="tag.name">
+            {{ tag.name }}
+          </option></select
         ><button
           class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700"
         >
@@ -141,5 +172,87 @@ function submit() {
         ⊕ 새로운 할 일 추가
       </button>
     </div>
+    <!-- 태그 모달 -->
+    <Teleport to="body">
+      <div
+        v-if="showTagModal"
+        class="fixed inset-0 z-50 grid place-items-center bg-slate-950/45 p-4"
+        @click.self="showTagModal = false"
+      >
+        <form
+          class="w-full max-w-sm rounded-2xl border border-blue-100 bg-white p-5 shadow-2xl dark:border-slate-700 dark:bg-[#152033]"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="tag-modal-title"
+          @submit.prevent="submitTag"
+          @keydown.esc="showTagModal = false"
+        >
+          <div class="flex items-center justify-between">
+            <h2 id="tag-modal-title" class="font-bold">새 태그 추가</h2>
+            <button
+              type="button"
+              class="text-xl text-slate-400 hover:text-slate-600"
+              aria-label="닫기"
+              @click="showTagModal = false"
+            >
+              ×
+            </button>
+          </div>
+          <label
+            class="mt-5 block text-xs font-semibold text-slate-500 dark:text-slate-300"
+            for="tag-name"
+            >태그 이름</label
+          >
+          <input
+            id="tag-name"
+            ref="tagNameInput"
+            v-model="tagName"
+            maxlength="20"
+            placeholder="예: 독서"
+            class="mt-2 w-full rounded-lg border border-blue-100 bg-slate-50 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-300 dark:border-slate-700 dark:bg-slate-800"
+            @input="tagError = ''"
+          />
+          <fieldset class="mt-5">
+            <legend class="text-xs font-semibold text-slate-500 dark:text-slate-300">
+              색상 선택
+            </legend>
+            <div class="mt-3 flex flex-wrap gap-3">
+              <label v-for="color in customTagColors" :key="color" class="cursor-pointer">
+                <input
+                  v-model="tagColor"
+                  type="radio"
+                  name="tag-color"
+                  :value="color"
+                  class="sr-only"
+                />
+                <span
+                  class="grid size-9 place-items-center rounded-full border-2 transition"
+                  :class="
+                    tagColor === color ? 'border-slate-700 dark:border-white' : 'border-transparent'
+                  "
+                  ><i class="size-6 rounded-full" :style="{ backgroundColor: color }"></i
+                ></span>
+                <span class="sr-only">{{ color }}</span>
+              </label>
+            </div>
+          </fieldset>
+          <p v-if="tagError" class="mt-3 text-xs text-rose-500">{{ tagError }}</p>
+          <div class="mt-6 flex justify-end gap-2">
+            <button
+              type="button"
+              class="rounded-lg px-4 py-2 text-sm text-slate-400"
+              @click="showTagModal = false"
+            >
+              취소
+            </button>
+            <button
+              class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700"
+            >
+              추가
+            </button>
+          </div>
+        </form>
+      </div>
+    </Teleport>
   </section>
 </template>
