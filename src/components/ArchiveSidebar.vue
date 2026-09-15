@@ -64,7 +64,7 @@ function badgeStyle(tag: string) {
             <div class="flex items-center justify-between gap-2 text-sm">
               <strong>{{ day.date }} ({{ day.day }})</strong>
               <span
-                class="whitespace-nowrap rounded-md px-2 py-1 text-xs"
+                class="whitespace-nowrap rounded-md px-1.5 py-0.5 text-xs"
                 :class="
                   day.completed / day.total < 0.5
                     ? 'bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-orange-300'

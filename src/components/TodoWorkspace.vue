@@ -66,15 +66,10 @@ const displayTodos = computed(() => {
     >
       <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <span
-            class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-500 dark:bg-slate-800 dark:text-slate-300"
-            ><i class="mr-2 inline-block size-2 rounded-full bg-emerald-500"></i>오늘의 루틴
-            집중</span
-          >
-          <h1 class="mt-2 text-2xl font-bold tracking-tight">오늘의 할 일</h1>
+          <h1 class="text-2xl font-bold tracking-tight">오늘의 할 일</h1>
         </div>
         <div
-          class="rounded-xl border border-blue-100 bg-blue-50 px-3 py-1.5 text-sm dark:border-slate-700 dark:bg-slate-800"
+          class="rounded-xl border border-blue-100 bg-blue-50 px-2.5 py-1 text-sm dark:border-slate-700 dark:bg-slate-800"
         >
           <i class="mr-2 inline-block size-2.5 rounded-full bg-emerald-500"></i
           ><span class="text-slate-500 dark:text-slate-400">달성률</span>

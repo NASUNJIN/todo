@@ -20,7 +20,7 @@ import StatsPanel from '@/components/StatsPanel.vue'
     <footer
       class="mt-auto mx-auto flex max-w-384 flex-col gap-2 border-t border-slate-200 px-6 py-5 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800"
     >
-      <span>TaskFlow · 할 일을 정리해 보아요</span
+      <span>Done It · 할 일을 정리해 보아요</span
       ><span>Enter 빠른 입력 · Click 완료 체크 · Tag 스마트 분류</span>
     </footer>
   </div>

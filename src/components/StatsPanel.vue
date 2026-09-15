@@ -61,7 +61,7 @@ const stroke = 339.292 // 원주 (2πr, r=54)
         </div>
         <div class="rounded-xl bg-blue-50 p-3 text-xs dark:bg-slate-800">
           <i class="mr-2 inline-block size-2.5 rounded-full bg-slate-300"></i
-          ><span class="text-slate-400">진행 중 / 남음</span
+          ><span class="text-slate-400">진행 중</span
           ><strong class="block pl-5">{{ todayTodos.length - completedCount }}개</strong>
         </div>
       </div>
@@ -76,7 +76,6 @@ const stroke = 339.292 // 원주 (2πr, r=54)
         <h2 class="text-sm font-bold flex items-center">
           <MdOutlinedBarChart class="inline-block mr-1.5" />태그별 진행 현황
         </h2>
-        <span class="text-xs text-slate-400">카테고리별</span>
       </div>
       <div class="mt-4 space-y-5">
         <div v-for="stat in visibleTagStats" :key="stat.tag">
