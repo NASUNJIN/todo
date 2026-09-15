@@ -34,7 +34,7 @@ const today = new Intl.DateTimeFormat('ko-KR', {
       </div>
       <div class="flex items-center gap-3">
         <span
-          class="rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs text-slate-600 sm:inline dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 flex items-centers"
+          class="rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs text-slate-600 sm:inline dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 flex items-center"
           ><AkCalendar class="inline-block mr-1.5" />{{ today }}</span
         >
         <button

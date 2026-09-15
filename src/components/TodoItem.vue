@@ -25,13 +25,30 @@ function save() {
   <li
     class="group flex min-h-14 items-center gap-3 rounded-xl border border-blue-100 bg-white px-3 py-2 transition hover:border-blue-200 dark:border-slate-700 dark:bg-[#111c2e] dark:hover:border-slate-600"
   >
+    <!-- 기본 체크 색상 -->
+    <!-- <button
+  class="grid size-7 shrink-0 place-items-center rounded-full border-2 text-white transition"
+  :class="
+  todo.completed
+  ? 'check-pop border-blue-500 bg-blue-500'
+  : 'border-slate-300 dark:border-slate-600'
+  "
+  :aria-label="todo.completed ? '미완료로 변경' : '완료로 변경'"
+  @click="store.toggleTodo(todo.id)"
+  >
+  <span v-if="todo.completed">✓</span>
+</button> -->
     <!-- 완료 체크 버튼 태그별 색상으로-->
     <button
-      class="grid size-7 shrink-0 place-items-center rounded-full border-2 text-white transition"
-      :class="
+      class="grid size-7 shrink-0 place-items-center rounded-full border-2 transition"
+      :class="todo.completed ? 'check-pop text-white' : 'border-slate-300 dark:border-slate-600'"
+      :style="
         todo.completed
-          ? 'check-pop border-blue-500 bg-blue-500'
-          : 'border-slate-300 dark:border-slate-600'
+          ? {
+              backgroundColor: store.tagColor(todo.tag),
+              borderColor: store.tagColor(todo.tag),
+            }
+          : {}
       "
       :aria-label="todo.completed ? '미완료로 변경' : '완료로 변경'"
       @click="store.toggleTodo(todo.id)"
@@ -86,7 +103,7 @@ function save() {
       title="할 일을 삭제하시겠습니까?"
       message="삭제한 할 일 데이터는 복구할 수 없습니다."
       @cancel="showDeleteConfirm = false"
-      @confirm="store.deleteTodo(todo.id); showDeleteConfirm = false"
+      @confirm="(store.deleteTodo(todo.id), (showDeleteConfirm = false))"
     />
   </li>
 </template>
