@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { nextTick, ref } from 'vue'
+import { nextTick, ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import TodoItem from './TodoItem.vue'
 import ConfirmDialog from './ConfirmDialog.vue'
 import { customTagColors, fallbackTag, type TodoTag } from '@/types/todo'
 import { useTodoStore } from '@/stores/todos'
-import { HiArchiveBox, HiTrash, HiTag } from '@kalimahapps/vue-icons'
+import { HiArchiveBox, HiTag } from '@kalimahapps/vue-icons'
 const store = useTodoStore()
 const { filteredTodos, completedCount, activeTag, todayTodos, completionRate, tags } =
   storeToRefs(store)
@@ -13,7 +13,7 @@ const title = ref('')
 const selectedTag = ref<TodoTag>('일')
 const showForm = ref(false)
 const showTagModal = ref(false)
-const showCompletedDeleteConfirm = ref(false)
+const showCompleted = ref(true)
 const tagPendingDelete = ref<TodoTag | null>(null)
 const tagName = ref('')
 const tagColor = ref(customTagColors[0]!)
@@ -54,10 +54,10 @@ function confirmTagDelete() {
   if (selectedTag.value === deletedTag) selectedTag.value = fallbackTag
   tagPendingDelete.value = null
 }
-function confirmCompletedDelete() {
-  store.clearCompleted()
-  showCompletedDeleteConfirm.value = false
-}
+const displayTodos = computed(() => {
+  if (showCompleted.value) return filteredTodos.value
+  return filteredTodos.value.filter((todo) => !todo.completed)
+})
 </script>
 <template>
   <section class="space-y-4">
@@ -162,20 +162,30 @@ function confirmCompletedDelete() {
             >총 {{ todayTodos.length }}개 중 {{ completedCount }}개 완료</span
           >
         </div>
-        <!-- 삭제 누르면 진짜 삭제할껀지 모달창 혹은 팝업창 띄우기 -->
+        <!-- 완료한 항목 숨기기/보기 버튼 -->
         <button
           v-if="completedCount"
-          class="text-xs text-slate-400 hover:text-rose-500 flex items-center"
-          @click="showCompletedDeleteConfirm = true"
+          class="text-xs text-slate-400 font-semibold"
+          :class="
+            showCompleted
+              ? 'text-slate-400 hover:text-slate-600'
+              : 'text-blue-500 hover:text-blue-600'
+          "
+          @click="showCompleted = !showCompleted"
         >
-          <HiTrash class="inline-block mr-1.5" />완료 항목 모두 삭제
+          {{ showCompleted ? '완료 항목 숨기기' : '완료 항목 보기' }}
         </button>
       </div>
-      <ul v-if="filteredTodos.length" class="mt-3 space-y-2">
-        <TodoItem v-for="todo in filteredTodos" :key="todo.id" :todo="todo" />
+
+      <ul v-if="displayTodos.length" class="mt-3 space-y-2">
+        <TodoItem v-for="todo in displayTodos" :key="todo.id" :todo="todo" />
       </ul>
+
       <div v-else class="py-12 text-center text-sm text-slate-400">
-        이 태그의 할 일이 아직 없어요.
+        <template v-if="filteredTodos.length > 0 && !showCompleted">
+          완료된 할 일이 숨겨져 있어요.
+        </template>
+        <template v-else> 이 태그의 할 일이 아직 없어요. </template>
       </div>
       <form
         v-if="showForm"
@@ -295,13 +305,6 @@ function confirmCompletedDelete() {
         </form>
       </div>
     </Teleport>
-    <ConfirmDialog
-      v-if="showCompletedDeleteConfirm"
-      title="완료 항목을 삭제하시겠습니까?"
-      message="오늘 완료한 항목이 모두 삭제되며, 삭제한 데이터는 복구할 수 없습니다."
-      @cancel="showCompletedDeleteConfirm = false"
-      @confirm="confirmCompletedDelete"
-    />
     <ConfirmDialog
       v-if="tagPendingDelete"
       title="태그를 삭제하시겠습니까?"
