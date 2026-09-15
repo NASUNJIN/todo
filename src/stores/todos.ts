@@ -70,6 +70,7 @@ export const useTodoStore = defineStore('todos', () => {
           for (const item of items) tagCounts[item.tag] = (tagCounts[item.tag] ?? 0) + 1
 
           return {
+            timestamp,
             date: `${date.getMonth() + 1}월 ${date.getDate()}일`,
             day: new Intl.DateTimeFormat('ko-KR', { weekday: 'short' })
               .format(date)

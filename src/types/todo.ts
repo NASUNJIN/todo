@@ -8,6 +8,7 @@ export interface Todo {
   createdAt: string
 }
 export interface ArchiveDay {
+  timestamp: number
   date: string
   day: string
   summary: string
