@@ -26,13 +26,15 @@ const archiveGroups = computed(() => {
     else groups[2]!.days.push(day)
   }
 
-  return groups.filter((group) => group.days.length)
+  return groups.filter((group) => group.days.length > 0)
 })
-const colors = {
-  일: 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300',
-  공부: 'bg-pink-100 text-pink-600 dark:bg-pink-950 dark:text-pink-300',
-  운동: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300',
-  개인: 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300',
+
+function badgeStyle(tag: string) {
+  const color = store.tagColor(tag)
+  return {
+    color,
+    backgroundColor: color + '1a',
+  }
 }
 </script>
 
@@ -61,9 +63,8 @@ const colors = {
           >
             <div class="flex items-center justify-between gap-2 text-sm">
               <strong>{{ day.date }} ({{ day.day }})</strong>
-              <!-- 완료 50미만일 경우 오렌지색 -->
               <span
-                class="whitespace-nowrap rounded-md px-2 py-1 text-xs font-bold"
+                class="whitespace-nowrap rounded-md px-1.5 py-0.5 text-xs"
                 :class="
                   day.completed / day.total < 0.5
                     ? 'bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-orange-300'
@@ -82,7 +83,7 @@ const colors = {
                 v-for="(count, tag) in day.tags"
                 :key="tag"
                 class="rounded px-1.5 py-0.5 text-[11px]"
-                :class="colors[tag]"
+                :style="badgeStyle(tag)"
                 >{{ tag }} {{ count }}</span
               >
             </div>

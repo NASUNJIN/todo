@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import type { Todo, TodoTag } from '@/types/todo'
-import { tags } from '@/types/todo'
 import { useTodoStore } from '@/stores/todos'
+import ConfirmDialog from './ConfirmDialog.vue'
 const props = defineProps<{ todo: Todo }>()
 const store = useTodoStore()
+const { tags } = storeToRefs(store)
 const editing = ref(false)
 const draft = ref(props.todo.title)
 const draftTag = ref<TodoTag>(props.todo.tag)
-// 태그 색상 뽑아놓기 + 추가 가능하게 만들기, 태그도 interface로 만들어서 타입 지정해주기
-const tagStyles = {
-  일: 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-300',
-  공부: 'bg-pink-50 text-pink-600 dark:bg-pink-950 dark:text-pink-300',
-  운동: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-300',
-  개인: 'bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-300',
+const showDeleteConfirm = ref(false)
+function tagStyle(tag: TodoTag) {
+  const color = store.tagColor(tag)
+  return { color, backgroundColor: `${color}1a` }
 }
 function save() {
   store.updateTodo(props.todo.id, draft.value, draftTag.value)
@@ -25,13 +25,30 @@ function save() {
   <li
     class="group flex min-h-14 items-center gap-3 rounded-xl border border-blue-100 bg-white px-3 py-2 transition hover:border-blue-200 dark:border-slate-700 dark:bg-[#111c2e] dark:hover:border-slate-600"
   >
+    <!-- 기본 체크 색상 -->
+    <!-- <button
+  class="grid size-7 shrink-0 place-items-center rounded-full border-2 text-white transition"
+  :class="
+  todo.completed
+  ? 'check-pop border-blue-500 bg-blue-500'
+  : 'border-slate-300 dark:border-slate-600'
+  "
+  :aria-label="todo.completed ? '미완료로 변경' : '완료로 변경'"
+  @click="store.toggleTodo(todo.id)"
+  >
+  <span v-if="todo.completed">✓</span>
+</button> -->
     <!-- 완료 체크 버튼 태그별 색상으로-->
     <button
-      class="grid size-7 shrink-0 place-items-center rounded-full border-2 text-white transition"
-      :class="
+      class="grid size-7 shrink-0 place-items-center rounded-full border-2 transition"
+      :class="todo.completed ? 'check-pop text-white' : 'border-slate-300 dark:border-slate-600'"
+      :style="
         todo.completed
-          ? 'check-pop border-blue-500 bg-blue-500'
-          : 'border-slate-300 dark:border-slate-600'
+          ? {
+              backgroundColor: store.tagColor(todo.tag),
+              borderColor: store.tagColor(todo.tag),
+            }
+          : {}
       "
       :aria-label="todo.completed ? '미완료로 변경' : '완료로 변경'"
       @click="store.toggleTodo(todo.id)"
@@ -50,7 +67,7 @@ function save() {
         v-model="draftTag"
         class="rounded-lg border border-blue-200 bg-white px-2 py-1 text-sm dark:border-slate-600 dark:bg-slate-800"
       >
-        <option v-for="tag in tags" :key="tag">{{ tag }}</option>
+        <option v-for="tag in tags" :key="tag.name" :value="tag.name">{{ tag.name }}</option>
       </select>
       <button class="text-sm font-bold text-blue-600" @click="save">저장</button>
     </template>
@@ -60,7 +77,7 @@ function save() {
         :class="todo.completed && 'text-slate-400 line-through'"
         >{{ todo.title }}</span
       >
-      <span class="rounded-full px-2.5 py-1 text-xs" :class="tagStyles[todo.tag]">{{
+      <span class="rounded-full px-2.5 py-1 text-xs" :style="tagStyle(todo.tag)">{{
         todo.tag
       }}</span>
       <div
@@ -75,11 +92,18 @@ function save() {
         ><button
           class="p-1 text-slate-400 hover:text-rose-500"
           aria-label="삭제"
-          @click="store.deleteTodo(todo.id)"
+          @click="showDeleteConfirm = true"
         >
           ×
         </button>
       </div>
     </template>
+    <ConfirmDialog
+      v-if="showDeleteConfirm"
+      title="할 일을 삭제하시겠습니까?"
+      message="삭제한 할 일 데이터는 복구할 수 없습니다."
+      @cancel="showDeleteConfirm = false"
+      @confirm="(store.deleteTodo(todo.id), (showDeleteConfirm = false))"
+    />
   </li>
 </template>

@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useTodoStore } from '@/stores/todos'
 import { MdOutlinedBarChart, BxSolidDoughnutChart } from '@kalimahapps/vue-icons'
 const store = useTodoStore()
 const { completionRate, completedCount, todayTodos, tagStats } = storeToRefs(store)
+const visibleTagStats = computed(() => tagStats.value.filter((stat) => stat.total > 0))
 const stroke = 339.292 // 원주 (2πr, r=54)
-// 태그별 색상 지정
-const colors = { 일: '#3b82f6', 공부: '#ec4899', 운동: '#10b981', 개인: '#a855f7' }
 </script>
 <template>
   <aside class="space-y-4">
@@ -61,7 +61,7 @@ const colors = { 일: '#3b82f6', 공부: '#ec4899', 운동: '#10b981', 개인: '
         </div>
         <div class="rounded-xl bg-blue-50 p-3 text-xs dark:bg-slate-800">
           <i class="mr-2 inline-block size-2.5 rounded-full bg-slate-300"></i
-          ><span class="text-slate-400">진행 중 / 남음</span
+          ><span class="text-slate-400">진행 중</span
           ><strong class="block pl-5">{{ todayTodos.length - completedCount }}개</strong>
         </div>
       </div>
@@ -76,26 +76,25 @@ const colors = { 일: '#3b82f6', 공부: '#ec4899', 운동: '#10b981', 개인: '
         <h2 class="text-sm font-bold flex items-center">
           <MdOutlinedBarChart class="inline-block mr-1.5" />태그별 진행 현황
         </h2>
-        <span class="text-xs text-slate-400">카테고리별</span>
       </div>
       <div class="mt-4 space-y-5">
-        <div v-for="stat in tagStats" :key="stat.tag">
+        <div v-for="stat in visibleTagStats" :key="stat.tag">
           <div class="mb-2 flex justify-between text-xs">
             <span
               ><i
                 class="mr-2 inline-block size-2.5 rounded-full"
-                :style="{ background: colors[stat.tag] }"
+                :style="{ background: stat.color }"
               ></i
               >{{ stat.tag }}
               <span class="text-slate-400"
                 >({{ stat.total }}개 중 {{ stat.completed }}개)</span
               ></span
-            ><strong :style="{ color: colors[stat.tag] }">{{ stat.rate }}%</strong>
+            ><strong :style="{ color: stat.color }">{{ stat.rate }}%</strong>
           </div>
           <div class="h-2 overflow-hidden rounded-full bg-blue-50 dark:bg-slate-800">
             <div
               class="h-full rounded-full transition-all duration-500"
-              :style="{ width: `${stat.rate}%`, background: colors[stat.tag] }"
+              :style="{ width: `${stat.rate}%`, background: stat.color }"
             ></div>
           </div>
         </div>
@@ -103,10 +102,11 @@ const colors = { 일: '#3b82f6', 공부: '#ec4899', 운동: '#10b981', 개인: '
       <div
         class="mt-5 flex justify-between border-t border-slate-200 pt-4 text-xs text-slate-400 dark:border-slate-700"
       >
-        <span
-          ><i class="mr-2 inline-block size-2 rounded-full bg-emerald-500"></i>실시간 동기화
-          중</span
-        ><span>자동 업데이트</span>
+        <span>
+          <i class="mr-2 inline-block size-2 rounded-full bg-emerald-500"></i>
+          실시간 동기화 중
+        </span>
+        <span>자동 업데이트</span>
       </div>
     </section>
   </aside>

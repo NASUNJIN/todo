@@ -1,4 +1,4 @@
-# TaskFlow
+# DoneIt
 
 Vue 3의 Composition API와 `<script setup>`, Pinia, Vue Router, Tailwind CSS를 학습하며 만든 3단 ToDo 대시보드입니다.
 
