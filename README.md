@@ -1,50 +1,94 @@
-# DoneIt
+# ✓ Done It
 
-Vue 3의 Composition API와 `<script setup>`, Pinia, Vue Router, Tailwind CSS를 학습하며 만든 3단 ToDo 대시보드입니다.
+> 오늘의 할 일을 기록하고, 태그별 진행 현황과 최근 기록을 한 화면에서 확인하는 To-do 대시보드입니다.
 
-## 실행하기
+![Vue](https://img.shields.io/badge/Vue-3-42b883?logo=vuedotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-```sh
+## 주요 기능
+
+- 할 일 추가, 수정, 완료 처리, 삭제 및 완료 항목 숨기기
+- `일`, `공부`, `운동`, `개인`, `기타` 태그 필터와 사용자 정의 태그·색상 추가
+- 오늘의 완료율 및 태그별 진행률을 즉시 갱신하는 통계 패널
+- 최근 7일간의 기록을 어제·이번 주·지난주로 나누어 보여주는 아카이브
+- 라이트/다크 모드 전환
+- 브라우저 Local Storage를 사용한 할 일, 태그, 테마 설정 자동 저장
+
+## 기술 스택
+
+| 구분      | 기술                                     |
+| --------- | ---------------------------------------- |
+| Framework | Vue 3, Composition API, `<script setup>` |
+| Language  | TypeScript                               |
+| Build     | Vite                                     |
+| State     | Pinia                                    |
+| Styling   | Tailwind CSS                             |
+| UI        | `@kalimahapps/vue-icons`, `vue3-lottie`  |
+
+## 시작하기
+
+### 요구 사항
+
+- Node.js `22.18.0` 이상 또는 `24.12.0` 이상
+- npm
+
+### 설치 및 실행
+
+```bash
 npm install
 npm run dev
 ```
 
-프로덕션 빌드와 타입 검사는 `npm run build`로 함께 실행합니다.
+명령 실행 후 터미널에 표시되는 로컬 주소(기본값: `http://localhost:5173`)를 브라우저에서 엽니다.
 
-## 처음 공부할 때 읽을 코드 순서
+### 사용 가능한 명령어
 
-1. `src/types/todo.ts` — 데이터 한 건의 모양(`Todo`)과 태그 타입을 확인합니다.
-2. `src/stores/todos.ts` — 상태, 계산된 값, CRUD 함수, localStorage 저장 흐름을 읽습니다.
-3. `src/views/HomeView.vue` — 페이지가 세 영역을 어떻게 조립하는지 확인합니다.
-4. `src/components/TodoWorkspace.vue` — `ref`, `storeToRefs`, 이벤트, 폼 바인딩을 익힙니다.
-5. `src/components/TodoItem.vue` — props와 수정/삭제/완료 이벤트 흐름을 봅니다.
-6. `src/components/StatsPanel.vue` — 계산 결과가 그래프로 바로 반영되는 방식을 봅니다.
-7. `src/stores/theme.ts` — 다크 모드 상태와 localStorage 동기화를 확인합니다.
-8. `src/assets/main.css` — Tailwind 진입점, 전역 폰트, 다크 모드 variant를 확인합니다.
+| 명령어               | 설명                                     |
+| -------------------- | ---------------------------------------- |
+| `npm run dev`        | 개발 서버 실행                           |
+| `npm run build`      | 타입 검사 후 프로덕션 빌드 생성          |
+| `npm run preview`    | 빌드 결과 미리 보기                      |
+| `npm run type-check` | TypeScript 타입 검사                     |
+| `npm run lint`       | ESLint와 Oxlint로 코드 검사 및 자동 수정 |
+| `npm run format`     | Prettier로 `src` 코드 포맷팅             |
 
-## 기능을 따라 만들어 보는 추천 순서
+## 사용 방법
 
-완성 코드를 한 번에 외우기보다 아래 순서로 작은 브랜치나 복사본에서 다시 만들어 보세요.
+1. **새로운 할 일 추가**를 눌러 할 일과 태그를 입력합니다.
+2. 목록의 체크 버튼으로 완료 상태를 바꾸고, 필요하면 항목을 수정하거나 삭제합니다.
+3. 상단 태그를 선택해 목록을 필터링합니다. **태그 추가**에서 이름과 색상을 지정할 수 있습니다.
+4. 오른쪽 패널에서 오늘의 달성률, 태그별 진행률, 최근 7일 기록을 확인합니다.
+5. 헤더의 테마 버튼으로 라이트/다크 모드를 전환합니다.
 
-1. 배열을 화면에 `v-for`로 출력합니다.
-2. 체크 버튼에 `@click`을 연결해 `completed`를 바꿉니다.
-3. 입력 폼과 `v-model`로 새 할 일을 추가합니다.
-4. 수정과 삭제 함수를 추가해 CRUD를 완성합니다.
-5. `computed`로 완료 개수와 달성률을 계산합니다.
-6. 태그 필터를 구현합니다.
-7. 상태를 컴포넌트 밖의 Pinia 스토어로 옮깁니다.
-8. `watch`로 localStorage에 저장합니다.
-9. Tailwind의 `dark:` 클래스로 두 테마를 만듭니다.
-10. 마지막으로 반응형 그리드와 그래프를 붙입니다.
+## 프로젝트 구조
 
-## 핵심 Vue 문법
+```text
+src/
+├── components/     # 할 일 목록, 통계, 아카이브 등 UI 컴포넌트
+├── stores/         # Pinia 상태 및 Local Storage 동기화
+├── types/          # Todo·태그 타입과 기본값
+├── views/          # 페이지 단위 컴포넌트
+├── router/         # Vue Router 설정
+└── assets/         # 전역 스타일 및 애니메이션 리소스
+```
 
-- `ref`: 입력값이나 선택된 필터처럼 바뀌는 값
-- `computed`: 할 일 배열에서 자동으로 계산되는 달성률과 통계
-- `v-model`: 입력 요소와 Vue 상태의 양방향 연결
-- `v-for`: 배열을 반복해 목록 렌더링
-- `v-if`: 입력 폼, 빈 상태, 편집 모드 조건부 표시
-- `defineProps`: 부모가 `TodoItem`에 할 일 한 건을 전달
-- Pinia action: 여러 컴포넌트가 같은 추가·수정·삭제 로직을 사용
+## 데이터 저장
 
-브라우저 개발자 도구의 Application → Local Storage에서 `taskflow-todos`와 `taskflow-theme` 값을 지우면 초기 상태로 되돌릴 수 있습니다.
+별도 백엔드 없이 브라우저의 Local Storage에 데이터를 저장합니다. 아래 키를 삭제하면 해당 데이터가 초기화됩니다.
+
+| 키               | 저장 내용        |
+| ---------------- | ---------------- |
+| `taskflow-todos` | 할 일 목록       |
+| `taskflow-tags`  | 사용자 정의 태그 |
+| `taskflow-theme` | 선택한 테마      |
+
+브라우저 개발자 도구의 **Application → Local Storage**에서 키를 삭제한 뒤 새로고침하세요.
+
+## 라이선스
+
+프로젝트 소스 코드는 [MIT License](LICENSE)로 배포됩니다.
+
+Lordicon 애니메이션과 아이콘 세트 등 제3자 자산은 각각의 라이선스를 따릅니다.
+상세한 자산 출처와 라이선스는 [NOTICE.md](NOTICE.md)에서 확인할 수 있습니다.
