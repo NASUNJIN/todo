@@ -5,6 +5,7 @@
 ![Vue](https://img.shields.io/badge/Vue-3-42b883?logo=vuedotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Nginx-2496ed?logo=docker&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ## 주요 기능
@@ -26,6 +27,7 @@
 | State     | Pinia                                    |
 | Styling   | Tailwind CSS                             |
 | UI        | `@kalimahapps/vue-icons`, `vue3-lottie`  |
+| Deploy    | Docker, Nginx                            |
 
 ## 시작하기
 
@@ -42,6 +44,26 @@ npm run dev
 ```
 
 명령 실행 후 터미널에 표시되는 로컬 주소(기본값: `http://localhost:5173`)를 브라우저에서 엽니다.
+
+## Docker로 실행하기
+
+Docker가 설치되어 있다면 별도의 로컬 Node.js 설정 없이 프로덕션 빌드를 실행할 수 있습니다.
+
+```bash
+# 이미지 빌드
+docker build -t done-it .
+
+# 컨테이너 실행
+docker run --rm -p 8080:80 --name done-it done-it
+```
+
+브라우저에서 `http://localhost:8080`을 열어 확인합니다. 실행 중인 컨테이너를 직접 중지하려면 다음 명령을 사용합니다.
+
+```bash
+docker stop done-it
+```
+
+Docker 이미지는 다단계 빌드를 사용합니다. 첫 번째 단계에서 Vue 애플리케이션을 빌드하고, 두 번째 단계에서 생성된 `dist` 파일을 Nginx로 제공합니다. `nginx.conf`의 `try_files` 설정을 통해 브라우저에서 경로를 직접 열거나 새로고침해도 Vue Router가 정상적으로 동작합니다.
 
 ### 사용 가능한 명령어
 
@@ -65,13 +87,16 @@ npm run dev
 ## 프로젝트 구조
 
 ```text
-src/
-├── components/     # 할 일 목록, 통계, 아카이브 등 UI 컴포넌트
-├── stores/         # Pinia 상태 및 Local Storage 동기화
-├── types/          # Todo·태그 타입과 기본값
-├── views/          # 페이지 단위 컴포넌트
-├── router/         # Vue Router 설정
-└── assets/         # 전역 스타일 및 애니메이션 리소스
+.
+├── src/
+│   ├── components/ # 할 일 목록, 통계, 아카이브 등 UI 컴포넌트
+│   ├── stores/     # Pinia 상태 및 Local Storage 동기화
+│   ├── types/      # Todo·태그 타입과 기본값
+│   ├── views/      # 페이지 단위 컴포넌트
+│   ├── router/     # Vue Router 설정
+│   └── assets/     # 전역 스타일 및 애니메이션 리소스
+├── Dockerfile      # 애플리케이션 빌드 및 Nginx 배포 이미지 설정
+└── nginx.conf      # 정적 파일 제공 및 SPA 라우팅 설정
 ```
 
 ## 데이터 저장
