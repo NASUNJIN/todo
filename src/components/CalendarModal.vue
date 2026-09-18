@@ -297,40 +297,30 @@ onBeforeUnmount(() => {
                     >{{ dayRate(day) }}%</span
                   >
                 </span>
-                <!-- 하단 영역 : 태그 요약 -->
-                <!-- <span
+
+                <!-- 하단 영역 : 태그 요약 (4개까지는 상세 표시, 5개부터는 +N 요약) -->
+                <div
                   v-if="tagSummary(day).length"
-                  class="w-full hidden flex-wrap gap-x-2 gap-y-0.5 sm:flex"
+                  class="w-full hidden flex-wrap items-center gap-x-2 gap-y-0.5 overflow-hidden sm:flex"
                 >
+                  <!-- 최대 4개까지만 점+숫자 -->
                   <span
-                    v-for="summary in tagSummary(day)"
+                    v-for="summary in tagSummary(day).slice(0, 4)"
                     :key="summary.tag"
                     class="inline-flex items-center gap-1 text-[10px] text-slate-500 dark:text-slate-400"
                   >
                     <i
-                      class="size-1.5 rounded-full"
+                      class="size-1.5 shrink-0 rounded-full"
                       :style="{ backgroundColor: tagColor(summary.tag) }"
                     />{{ summary.completed }}/{{ summary.total }}
                   </span>
-                </span> -->
-                <!-- 하단 영역 태그 요약 (색상 점만 깔끔하게 표시) -->
-                <div
-                  v-if="tagSummary(day).length"
-                  class="flex w-full flex-wrap items-center gap-1 overflow-hidden"
-                >
-                  <i
-                    v-for="summary in tagSummary(day).slice(0, 5)"
-                    :key="summary.tag"
-                    class="size-1.5 shrink-0 rounded-full"
-                    :style="{ backgroundColor: tagColor(summary.tag) }"
-                    :title="`${summary.tag} (${summary.completed}/${summary.total})`"
-                  />
-                  <!-- 태그 종류가 5개가 넘어가면 +N 표시 -->
+
+                  <!-- 태그 5개 이상, 남은 개수를 +N 형태 -->
                   <span
-                    v-if="tagSummary(day).length > 5"
-                    class="text-[9px] leading-none text-slate-400 dark:text-slate-400"
+                    v-if="tagSummary(day).length > 4"
+                    class="text-[10px] font-bold text-slate-400 dark:text-slate-500"
                   >
-                    +{{ tagSummary(day).length - 5 }}
+                    +{{ tagSummary(day).length - 4 }}
                   </span>
                 </div>
 
@@ -344,95 +334,89 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- 우측 : 선택된 날짜의 할 일 목록 -->
-          <aside
-            class="flex min-h-107 flex-col bg-slate-50 p-5 dark:bg-slate-950/35 sm:p-6 lg:min-h-0 lg:overflow-y-auto"
+          <div
+            class="relative lg:h-full border-t border-slate-200 dark:border-slate-700 lg:border-t-0"
           >
-            <div class="border-b border-slate-200 pb-4 dark:border-slate-700">
-              <div class="flex items-center justify-between gap-3 text-sm">
-                <h3 class="text-lg font-bold">
-                  {{ format(selectedDate, 'M월 d일 (EEE)', { locale: ko }) }}
-                </h3>
-                <span
-                  v-if="selectedTodos.length"
-                  class="rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-400"
-                  >달성률 {{ selectedCompleted }}/{{ selectedTodos.length }} 완료 ({{
-                    selectedRate
-                  }}%)</span
-                >
+            <aside class="flex flex-col bg-slate-50 dark:bg-slate-950/35 lg:absolute lg:inset-0">
+              <!-- 상단 : 날짜 및 달성률 -->
+              <div
+                class="shrink-0 border-b border-slate-200 px-5 py-4 dark:border-slate-700 sm:px-6 sm:py-5"
+              >
+                <div class="flex items-center justify-between gap-3 text-sm">
+                  <h3 class="text-lg font-bold">
+                    {{ format(selectedDate, 'M월 d일 (EEE)', { locale: ko }) }}
+                  </h3>
+                  <span
+                    v-if="selectedTodos.length"
+                    class="rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-400"
+                    >달성률 {{ selectedCompleted }}/{{ selectedTodos.length }} 완료 ({{
+                      selectedRate
+                    }}%)</span
+                  >
+                </div>
               </div>
-            </div>
 
-            <!-- <div
-              v-if="selectedTodos.length"
-              class="mt-4 rounded-xl bg-white p-4 dark:bg-slate-800/70"
-            >
-              <div class="flex items-center gap-3">
-                <strong
-                  class="grid size-10 place-items-center rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-400"
-                  >{{ selectedRate }}%</strong
-                >
-                <span class="text-sm font-semibold"
-                  >목표 {{ selectedTodos.length }}개 중 {{ selectedCompleted }}개 완료</span
-                >
+              <!-- 하단 : 선택한 날짜의 할 일 -->
+              <div class="flex-1 overflow-y-auto p-5 sm:p-6 justify-center">
+                <ul v-if="selectedTodos.length" class="gap-4 space-y-2.5">
+                  <li v-for="todo in selectedTodos" :key="todo.id">
+                    <label
+                      class="relative flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/70 dark:hover:bg-slate-800"
+                    >
+                      <input
+                        :checked="todo.completed"
+                        type="checkbox"
+                        class="peer sr-only"
+                        @change="store.toggleTodo(todo.id)"
+                      />
+                      <span
+                        class="grid size-6 shrink-0 place-items-center rounded-full border-2 border-slate-300 text-sm text-transparent peer-checked:border-transparent peer-checked:text-white dark:border-slate-500"
+                        :class="
+                          todo.completed
+                            ? 'check-pop text-white'
+                            : 'border-slate-300 dark:border-slate-600'
+                        "
+                        :style="
+                          todo.completed ? { backgroundColor: tagColor(todo.tag) } : undefined
+                        "
+                        >✓</span
+                      >
+                      <span
+                        class="min-w-0 flex-1 text-sm"
+                        :class="
+                          todo.completed
+                            ? 'text-slate-400 line-through dark:text-slate-500'
+                            : 'text-slate-700 dark:text-slate-200'
+                        "
+                        >{{ todo.title }}</span
+                      >
+                      <span
+                        class="shrink-0 rounded-full px-2 py-1 text-[11px]"
+                        :style="{
+                          color: tagColor(todo.tag),
+                          backgroundColor: `${tagColor(todo.tag)}18`,
+                        }"
+                        >{{ todo.tag }}</span
+                      >
+                    </label>
+                  </li>
+                </ul>
+                <div v-else class="flex h-full items-center py-16 text-center justify-center">
+                  <div>
+                    <p class="text-slate-300 dark:text-slate-700">
+                      <FlEmojiSad class="inline-block size-8" />
+                    </p>
+                    <p class="mt-2 text-sm font-semibold text-slate-500 dark:text-slate-400">
+                      이 날짜에는 기록이 없어요
+                    </p>
+                    <p class="mt-1 text-xs text-slate-400 dark:text-slate-600">
+                      기록이 있는 다른 날짜를 선택해 주세요.
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div> -->
-
-            <!-- 선택한 날짜의 할 일 -->
-            <ul v-if="selectedTodos.length" class="mt-4 space-y-2.5">
-              <li v-for="todo in selectedTodos" :key="todo.id">
-                <label
-                  class="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/70 dark:hover:bg-slate-800"
-                >
-                  <input
-                    :checked="todo.completed"
-                    type="checkbox"
-                    class="peer sr-only"
-                    @change="store.toggleTodo(todo.id)"
-                  />
-                  <span
-                    class="grid size-6 shrink-0 place-items-center rounded-full border-2 border-slate-300 text-sm text-transparent peer-checked:border-transparent peer-checked:text-white dark:border-slate-500"
-                    :class="
-                      todo.completed
-                        ? 'check-pop text-white'
-                        : 'border-slate-300 dark:border-slate-600'
-                    "
-                    :style="todo.completed ? { backgroundColor: tagColor(todo.tag) } : undefined"
-                    >✓</span
-                  >
-                  <span
-                    class="min-w-0 flex-1 text-sm"
-                    :class="
-                      todo.completed
-                        ? 'text-slate-400 line-through dark:text-slate-500'
-                        : 'text-slate-700 dark:text-slate-200'
-                    "
-                    >{{ todo.title }}</span
-                  >
-                  <span
-                    class="shrink-0 rounded-full px-2 py-1 text-[11px]"
-                    :style="{
-                      color: tagColor(todo.tag),
-                      backgroundColor: `${tagColor(todo.tag)}18`,
-                    }"
-                    >{{ todo.tag }}</span
-                  >
-                </label>
-              </li>
-            </ul>
-            <div v-else class="grid flex-1 place-items-center py-16 text-center">
-              <div>
-                <p class="text-3xl text-slate-300 dark:text-slate-700">
-                  <FlEmojiSad class="inline-block" />
-                </p>
-                <p class="mt-2 text-sm font-semibold text-slate-500 dark:text-slate-400">
-                  이 날짜에는 기록이 없어요
-                </p>
-                <p class="mt-1 text-xs text-slate-400 dark:text-slate-600">
-                  기록이 있는 다른 날짜를 선택해 주세요.
-                </p>
-              </div>
-            </div>
-          </aside>
+            </aside>
+          </div>
         </div>
       </section>
     </div>
