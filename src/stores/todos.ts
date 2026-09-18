@@ -2,8 +2,8 @@ import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import type { ArchiveDay, TagDefinition, Todo, TodoTag } from '@/types/todo'
 import { defaultTags, fallbackTag } from '@/types/todo'
-const STORAGE_KEY = 'taskflow-todos'
-const TAG_STORAGE_KEY = 'taskflow-tags'
+const STORAGE_KEY = 'doneit-todos'
+const TAG_STORAGE_KEY = 'doneit-tags'
 const DAY_IN_MS = 24 * 60 * 60 * 1000
 
 function startOfDay(value: Date) {
@@ -11,7 +11,8 @@ function startOfDay(value: Date) {
 }
 
 function todoDate(todo: Todo) {
-  const date = new Date(todo.createdAt)
+  const value = todo.targetDate || todo.createdAt
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(`${value}T00:00:00`) : new Date(value)
   return Number.isNaN(date.getTime()) ? null : startOfDay(date)
 }
 
@@ -102,14 +103,17 @@ export const useTodoStore = defineStore('todos', () => {
 
   function addTodo(title: string, tag: TodoTag) {
     const clean = title.trim()
-    if (clean)
+    if (clean) {
+      const now = new Date()
       todos.value.push({
         id: crypto.randomUUID(),
         title: clean,
         tag,
         completed: false,
-        createdAt: new Date().toISOString(),
+        createdAt: now.toISOString(),
+        targetDate: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`,
       })
+    }
   }
 
   function addTag(name: string, color: string) {

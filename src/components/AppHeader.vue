@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useThemeStore } from '@/stores/theme'
-import { AkCalendar } from '@kalimahapps/vue-icons'
+import { AkCalendar, AkSunFill, IoOutlineMoon } from '@kalimahapps/vue-icons'
 import { Vue3Lottie } from 'vue3-lottie'
 import logoAnimation from '@/assets/check_logo.json'
 const theme = useThemeStore()
@@ -28,15 +28,18 @@ const today = new Intl.DateTimeFormat('ko-KR', {
       </div>
       <div class="flex items-center gap-3">
         <span
-          class="rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs text-slate-600 sm:inline dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 flex items-center"
+          class="rounded-full border-blue-10 bg-blue-50 px-3 py-1.5 text-xs text-slate-600 sm:inline dark:bg-slate-800 dark:text-slate-300 flex items-center"
           ><AkCalendar class="inline-block mr-1.5" />{{ today }}</span
         >
         <button
-          class="grid size-10 place-items-center rounded-xl bg-slate-100 text-lg transition hover:bg-slate-200 focus-visible:outline-2 focus-visible:outline-blue-500 dark:bg-slate-800 dark:hover:bg-slate-700"
+          class="grid size-10 place-items-center rounded-xl"
           :aria-label="theme.isDark ? '라이트 모드로 전환' : '다크 모드로 전환'"
           @click="theme.toggleTheme"
         >
-          <span aria-hidden="true">{{ theme.isDark ? '☀' : '☾' }}</span>
+          <span aria-hidden="true" class="flex items-center justify-center">
+            <AkSunFill v-if="theme.isDark" class="size-5" />
+            <IoOutlineMoon v-else class="size-4" />
+          </span>
         </button>
       </div>
     </div>
