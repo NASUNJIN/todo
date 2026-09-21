@@ -6,6 +6,21 @@ const STORAGE_KEY = 'doneit-todos'
 const TAG_STORAGE_KEY = 'doneit-tags'
 const DAY_IN_MS = 24 * 60 * 60 * 1000
 
+function generateId(): string {
+  // crypto 기능있고, randomUUID 사용할 수 있는 경우 (localhost, HTTPS)
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID()
+  }
+  // crypto 있고, getRandomValues 사용 가능한 경우 (HTTP 환경)
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    const array = new Uint32Array(1)
+    crypto.getRandomValues(array)
+    return 'todo-' + array[0]?.toString(36) + '-' + Date.now().toString(36)
+  }
+  // 최후 (똥컴 - 1, 2단계 보안 API 존재 하지 않는 익스플로어 상태)
+  return 'todo-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 9)
+}
+
 function startOfDay(value: Date) {
   return new Date(value.getFullYear(), value.getMonth(), value.getDate())
 }
@@ -106,7 +121,7 @@ export const useTodoStore = defineStore('todos', () => {
     if (clean) {
       const now = new Date()
       todos.value.push({
-        id: crypto.randomUUID(),
+        id: generateId(),
         title: clean,
         tag,
         completed: false,
