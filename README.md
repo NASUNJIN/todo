@@ -19,15 +19,16 @@
 
 ## 기술 스택
 
-| 구분      | 기술                                     |
-| --------- | ---------------------------------------- |
-| Framework | Vue 3, Composition API, `<script setup>` |
-| Language  | TypeScript                               |
-| Build     | Vite                                     |
-| State     | Pinia                                    |
-| Styling   | Tailwind CSS                             |
-| UI        | `@kalimahapps/vue-icons`, `vue3-lottie`  |
-| Deploy    | Docker, Nginx                            |
+| 구분      | 기술                                       |
+| --------- | ------------------------------------------ |
+| Framework | Vue 3, Composition API, `<script setup>`   |
+| Language  | TypeScript                                 |
+| Build     | Vite                                       |
+| State     | Pinia                                      |
+| Styling   | Tailwind CSS                               |
+| Utills    | `date-fns` (날짜 계산 및 캘린더 로직 처리) |
+| UI        | `@kalimahapps/vue-icons`, `vue3-lottie`    |
+| Deploy    | Docker, Nginx                              |
 
 ## 시작하기
 
@@ -54,16 +55,18 @@ Docker가 설치되어 있다면 별도의 로컬 Node.js 설정 없이 프로�
 docker build -t done-it .
 
 # 컨테이너 실행
-docker run --rm -p 8080:80 --name done-it done-it
+docker run --rm -p 8618:80 --name done-it done-it
 ```
 
-브라우저에서 `http://localhost:8080`을 열어 확인합니다. 실행 중인 컨테이너를 직접 중지하려면 다음 명령을 사용합니다.
+브라우저에서 `http://localhost:8618`을 열어 확인합니다.실행 중인 컨테이너를 직접 중지하려면 다음 명령을 사용합니다.
 
 ```bash
 docker stop done-it
 ```
 
-Docker 이미지는 다단계 빌드를 사용합니다. 첫 번째 단계에서 Vue 애플리케이션을 빌드하고, 두 번째 단계에서 생성된 `dist` 파일을 Nginx로 제공합니다. `nginx.conf`의 `try_files` 설정을 통해 브라우저에서 경로를 직접 열거나 새로고침해도 Vue Router가 정상적으로 동작합니다.
+Docker 이미지는 다단계 빌드를 사용합니다. 첫 번째 단계에서 Vue 애플리케이션을 빌드하고,
+두 번째 단계에서 생성된 `dist` 파일을 Nginx로 제공합니다.
+`nginx.conf`의 `try_files` 설정을 통해 브라우저에서 경로를 직접 열거나 새로고침해도 Vue Router가 정상적으로 동작합니다.
 
 ### 사용 가능한 명령어
 
@@ -76,20 +79,32 @@ Docker 이미지는 다단계 빌드를 사용합니다. 첫 번째 단계에서
 | `npm run lint`       | ESLint와 Oxlint로 코드 검사 및 자동 수정 |
 | `npm run format`     | Prettier로 `src` 코드 포맷팅             |
 
+### 📱 앱 설치 없이 스마트폰/다른 PC에서 사용하기
+
+현재 PC에서 Docker 컨테이너가 실행 중이라면, 동일한 와이파이(공유기)에 연결된 스마트폰이나 태블릿, 다른 PC에서는
+**별도의 앱 설치 없이 웹 브라우저만으로** 즉시 대시보드에 접속할 수 있습니다.
+
+스마트폰의 웹 브라우저(Safari, Chrome 등) 주소창에 호스트 PC의 IP 주소와 포트 번호를 입력해 보세요.
+
+- **접속 주소:** `http://192.168.0.253:8618`
+
+> **💡 참고:** 접속이 되지 않는다면 호스트 PC의 방화벽(Windows Defender 인바운드 규칙 등)에서 해당 포트(8618)의 외부 접근을 허용해 주어야 합니다.
+
 ## 사용 방법
 
 1. **새로운 할 일 추가**를 눌러 할 일과 태그를 입력합니다.
 2. 목록의 체크 버튼으로 완료 상태를 바꾸고, 필요하면 항목을 수정하거나 삭제합니다.
 3. 상단 태그를 선택해 목록을 필터링합니다. **태그 추가**에서 이름과 색상을 지정할 수 있습니다.
 4. 오른쪽 패널에서 오늘의 달성률, 태그별 진행률, 최근 7일 기록을 확인합니다.
-5. 헤더의 테마 버튼으로 라이트/다크 모드를 전환합니다.
+5. **캘린더로 전체 보기** 버튼을 클릭하여 모든 과거의 기록을 월별 달력 형태로 조회합니다.
+6. 헤더의 테마 버튼으로 라이트/다크 모드를 전환합니다.
 
 ## 프로젝트 구조
 
 ```text
 .
 ├── src/
-│   ├── components/ # 할 일 목록, 통계, 아카이브 등 UI 컴포넌트
+│   ├── components/ # 할 일 목록, 통계, 아카이브, 캘린더 모달 등 UI 컴포넌트
 │   ├── stores/     # Pinia 상태 및 Local Storage 동기화
 │   ├── types/      # Todo·태그 타입과 기본값
 │   ├── views/      # 페이지 단위 컴포넌트
@@ -103,11 +118,11 @@ Docker 이미지는 다단계 빌드를 사용합니다. 첫 번째 단계에서
 
 별도 백엔드 없이 브라우저의 Local Storage에 데이터를 저장합니다. 아래 키를 삭제하면 해당 데이터가 초기화됩니다.
 
-| 키               | 저장 내용        |
-| ---------------- | ---------------- |
-| `taskflow-todos` | 할 일 목록       |
-| `taskflow-tags`  | 사용자 정의 태그 |
-| `taskflow-theme` | 선택한 테마      |
+| 키             | 저장 내용        |
+| -------------- | ---------------- |
+| `doneit-todos` | 할 일 목록       |
+| `doneit-tags`  | 사용자 정의 태그 |
+| `doneit-theme` | 선택한 테마      |
 
 브라우저 개발자 도구의 **Application → Local Storage**에서 키를 삭제한 뒤 새로고침하세요.
 

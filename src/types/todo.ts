@@ -22,6 +22,7 @@ export interface Todo {
   tag: TodoTag
   completed: boolean
   createdAt: string
+  targetDate: string
 }
 export interface ArchiveDay {
   timestamp: number

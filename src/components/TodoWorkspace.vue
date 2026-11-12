@@ -5,7 +5,7 @@ import TodoItem from './TodoItem.vue'
 import ConfirmDialog from './ConfirmDialog.vue'
 import { customTagColors, fallbackTag, type TodoTag } from '@/types/todo'
 import { useTodoStore } from '@/stores/todos'
-import { HiArchiveBox, HiTag } from '@kalimahapps/vue-icons'
+import { HiArchiveBox, HiTag, AkCross, BsPlus, BsPlusCircle } from '@kalimahapps/vue-icons'
 const store = useTodoStore()
 const { filteredTodos, completedCount, activeTag, todayTodos, completionRate, tags } =
   storeToRefs(store)
@@ -132,14 +132,14 @@ const displayTodos = computed(() => {
             :aria-label="`${tag.name} 태그 삭제`"
             @click="tagPendingDelete = tag.name"
           >
-            ×
+            <AkCross class="size-2" />
           </button>
         </div>
         <button
-          class="rounded-full border border-dashed border-slate-300 px-2.5 py-1 text-sm text-slate-500 transition hover:border-blue-300 hover:text-blue-600 dark:border-slate-600 dark:text-slate-300"
+          class="flex items-center rounded-full border border-dashed border-slate-300 px-2.5 py-1 text-sm text-slate-500 transition hover:border-blue-300 hover:text-blue-600 dark:border-slate-600 dark:text-slate-300"
           @click="openTagModal"
         >
-          ＋ 태그 추가
+          <BsPlus class="size-4" /> 태그 추가
         </button>
       </div>
     </div>
@@ -212,10 +212,11 @@ const displayTodos = computed(() => {
       </form>
       <button
         v-else
-        class="mt-4 w-full rounded-xl border-2 border-dashed border-blue-100 py-3 text-sm text-slate-500 hover:border-blue-300 hover:text-blue-600 dark:border-slate-700 dark:text-slate-400"
+        class="flex items-center justify-center mt-4 w-full rounded-xl border-2 border-dashed border-blue-100 py-3 text-sm text-slate-500 hover:border-blue-300 hover:text-blue-600 dark:border-slate-700 dark:text-slate-400"
         @click="openTodoForm"
       >
-        ⊕ 새로운 할 일 추가
+        <BsPlusCircle class="inline-block mr-1 size-4" />
+        새로운 할 일 추가
       </button>
     </div>
     <!-- 태그 모달 -->
@@ -241,7 +242,7 @@ const displayTodos = computed(() => {
               aria-label="닫기"
               @click="showTagModal = false"
             >
-              ×
+              <AkCross />
             </button>
           </div>
           <label
