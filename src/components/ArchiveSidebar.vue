@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useTodoStore } from '@/stores/todos'
 import type { ArchiveDay } from '@/types/todo'
-import { AkHistory, MdRoundAutoGraph, RaCalendar } from '@kalimahapps/vue-icons'
+import { AkHistory, MdRoundAutoGraph, AkCalendar } from '@kalimahapps/vue-icons'
+import CalendarModal from './CalendarModal.vue'
 const store = useTodoStore()
 const { archive, weeklyCompletionRate } = storeToRefs(store)
+const showCalendar = ref(false)
 const DAY_IN_MS = 24 * 60 * 60 * 1000
 
 const archiveGroups = computed(() => {
@@ -94,9 +96,11 @@ function badgeStyle(tag: string) {
         최근 7일간 과거 기록이 없어요.
       </p>
       <button
+        type="button"
         class="mt-3 w-full rounded-xl border border-blue-100 bg-blue-50 py-2 text-xs font-semibold text-slate-600 hover:bg-blue-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 flex items-center justify-center"
+        @click="showCalendar = true"
       >
-        <RaCalendar class="inline-block mr-1.5" />캘린더로 전체 보기
+        <AkCalendar class="inline-block mr-1.5" />캘린더로 전체 보기
       </button>
     </section>
     <div
@@ -110,5 +114,6 @@ function badgeStyle(tag: string) {
         >{{ weeklyCompletionRate }}%</strong
       >
     </div>
+    <CalendarModal v-if="showCalendar" @close="showCalendar = false" />
   </aside>
 </template>

@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia'
 import type { Todo, TodoTag } from '@/types/todo'
 import { useTodoStore } from '@/stores/todos'
 import ConfirmDialog from './ConfirmDialog.vue'
+import { AkCross, AkEdit } from '@kalimahapps/vue-icons'
 const props = defineProps<{ todo: Todo }>()
 const store = useTodoStore()
 const { tags } = storeToRefs(store)
@@ -81,20 +82,20 @@ function save() {
         todo.tag
       }}</span>
       <div
-        class="flex opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
+        class="flex opacity-100 transition sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
       >
         <button
           class="p-1 text-slate-400 hover:text-blue-500"
           aria-label="수정"
           @click="editing = true"
         >
-          ✎</button
+          <AkEdit /></button
         ><button
           class="p-1 text-slate-400 hover:text-rose-500"
           aria-label="삭제"
           @click="showDeleteConfirm = true"
         >
-          ×
+          <AkCross class="size-3" />
         </button>
       </div>
     </template>
