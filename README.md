@@ -1,6 +1,7 @@
 # ✓ Done It
 
 > 오늘의 할 일을 기록하고, 태그별 진행 현황과 최근 기록을 한 화면에서 확인하는 To-do 대시보드입니다.
+깃허브 페이지에서 이용 가능합니다.
 
 ![Vue](https://img.shields.io/badge/Vue-3-42b883?logo=vuedotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)
